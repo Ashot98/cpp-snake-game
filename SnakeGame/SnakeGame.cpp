@@ -102,6 +102,7 @@ void SnakeGame::draw()
 	}
 	std::cout << std::endl << std::endl;
 	std::cout << "Score: " << _score;
+	std::cout << std::endl << std::endl;
 }
 
 void SnakeGame::input()
@@ -129,49 +130,79 @@ void SnakeGame::input()
 
 void SnakeGame::logic(size_t &frameCount)
 {
+	std::vector<int> tailX = player->getTailX();
+	std::vector<int> tailY = player->getTailY();
+	size_t tailSize = tailX.size();
+	bool isEating{ false };
+
 	if (frameCount == 30 / _speedReg)
 	{
 		player->move();
 		frameCount = 0;
-	}
-	
-	if (player->getX() == 0)
-	{
-		player->setX(_width - 2);
-	}
-	else if (player->getX() == _width - 1)
-	{
-		player->setX(1);
-	}
+		int playerX = player->getX();
+		int playerY = player->getY();
 
-	if (player->getY() == 0)
-	{
-		player->setY(_height - 2);
-	}
-	else if (player->getY() == _height - 1)
-	{
-		player->setY(1);
-	}
+		if (playerX == 0)
+		{
+			player->setX(_width - 2);
+		}
+		else if (playerX == _width - 1)
+		{
+			player->setX(1);
+		}
 
-	if (player->getX() == _fruitX && player->getY() == _fruitY)
-	{
-		player->eat();
+		if (playerY == 0)
+		{
+			player->setY(_height - 2);
+		}
+		else if (playerY == _height - 1)
+		{
+			player->setY(1);
+		}
 
-		_score += 10;
+		if (playerX == _fruitX && playerY == _fruitY)
+		{
+			player->eat();
 
-		int newFruitX, newFruitY;
+			_score += 10;
+			isEating = true;
 
-		do {
-			newFruitX = 1 + rand() % (_width - 2);
-			newFruitY = 1 + rand() % (_height - 2);
-		} while (newFruitX == player->getX() && newFruitY == player->getY());
+			int newFruitX, newFruitY;
 
-		_fruitX = newFruitX;
-		_fruitY = newFruitY;
+			do {
+				newFruitX = 1 + rand() % (_width - 2);
+				newFruitY = 1 + rand() % (_height - 2);
+			} while (newFruitX == player->getX() && newFruitY == player->getY());
+
+			_fruitX = newFruitX;
+			_fruitY = newFruitY;
+		}
+
+		for (size_t i = 0; i < tailSize; ++i)
+		{
+			if (playerX == tailX[i] && playerY == tailY[i] && !isEating)
+			{
+				_state = OVER;
+			}
+		}
 	}
 }
 
 void SnakeGame::restart()
 {
+	delete player;
+	player = new Player(_width / 2 - 1, _height / 2 - 1);
+	
+	_score = 0;
+	_state = RESUME;
 
+	int firstFruitX, firstFruitY;
+
+	do {
+		firstFruitX = 1 + rand() % (_width - 2);
+		firstFruitY = 1 + rand() % (_height - 2);
+	} while (firstFruitX == player->getX() && firstFruitY == player->getY());
+
+	_fruitX = firstFruitX;
+	_fruitY = firstFruitY;
 }
