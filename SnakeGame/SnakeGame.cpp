@@ -55,6 +55,12 @@ void SnakeGame::exec()
 void SnakeGame::draw()
 {
 	system("cls");
+
+	bool isTail;
+	std::vector<int> tailX = player->getTailX();
+	std::vector<int> tailY = player->getTailY();
+	size_t tailSize = tailX.size();
+
 	for (size_t i = 0; i < _width; ++i)
 	{
 		std::cout << '#';
@@ -65,6 +71,8 @@ void SnakeGame::draw()
 	{
 		for (size_t j = 0; j < _width; ++j)
 		{
+			isTail = false;
+
 			if (j == 0 || j == _width - 1)
 				std::cout << '#';
 			else if (j == _fruitX && i == _fruitY)
@@ -72,7 +80,18 @@ void SnakeGame::draw()
 			else if (j == player->getX() && i == player->getY())
 				std::cout << 'O';
 			else
-				std::cout << ' ';
+			{
+				for (size_t k = 0; k < tailSize; ++k)
+				{
+					if (j == tailX[k] && i == tailY[k])
+					{
+						isTail = true;
+						std::cout << 'o';
+					}
+				}
+				if (!isTail)
+					std::cout << ' ';
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -136,6 +155,8 @@ void SnakeGame::logic(size_t &frameCount)
 
 	if (player->getX() == _fruitX && player->getY() == _fruitY)
 	{
+		player->eat();
+
 		_score += 10;
 
 		int newFruitX, newFruitY;

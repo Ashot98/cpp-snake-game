@@ -18,9 +18,13 @@ public:
 
 	void changeDirection(PlayerDirection newDir);
 	void move();
+	void eat();
 
 	int getX();
 	int getY();
+
+	std::vector<int> getTailX();
+	std::vector<int> getTailY();
 
 	void setX(int x);
 	void setY(int y);

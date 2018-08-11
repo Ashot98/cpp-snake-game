@@ -13,11 +13,19 @@ Player::~Player()
 
 void Player::changeDirection(PlayerDirection newDir)
 {
+	if (_direction && abs(_direction - newDir) == 2)
+	{
+		return;
+	}
 	_direction = newDir;
 }
 
 void Player::move()
 {
+	int prevX{ _x };
+	int prevY{ _y };
+	int tmp;
+
 	switch (_direction)
 	{
 	case UP:
@@ -33,6 +41,27 @@ void Player::move()
 		--_x;
 		break;
 	}
+
+	size_t tailSize = _tailX.size();
+	for(size_t i =0; i < tailSize; ++i)
+	{
+		if (_tailX[i] != prevX || _tailY[i] != prevY)
+		{
+			tmp = prevX;
+			prevX = _tailX[i];
+			_tailX[i] = tmp;
+			
+			tmp = prevY;
+			prevY = _tailY[i];
+			_tailY[i] = tmp;
+		}
+	}
+}
+
+void Player::eat()
+{
+	_tailX.push_back(_x);
+	_tailY.push_back(_y);
 }
 
 int Player::getX()
@@ -43,6 +72,16 @@ int Player::getX()
 int Player::getY()
 {
 	return _y;
+}
+
+std::vector<int> Player::getTailX()
+{
+	return _tailX;
+}
+
+std::vector<int> Player::getTailY()
+{
+	return _tailY;
 }
 
 void Player::setX(int x)
