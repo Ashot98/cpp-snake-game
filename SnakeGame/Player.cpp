@@ -44,3 +44,13 @@ int Player::getY()
 {
 	return _y;
 }
+
+void Player::setX(int x)
+{
+	_x = x;
+}
+
+void Player::setY(int y)
+{
+	_y = y;
+}

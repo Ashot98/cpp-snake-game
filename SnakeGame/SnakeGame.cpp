@@ -1,6 +1,7 @@
 #include "SnakeGame.h"
 #include <iostream>
 #include <conio.h>
+#include <Windows.h>
 
 int SnakeGame::_width{ 20 };
 int SnakeGame::_height{ 20 };
@@ -8,6 +9,18 @@ int SnakeGame::_height{ 20 };
 SnakeGame::SnakeGame()
 {
 	player = new Player(_width / 2 - 1, _height / 2 - 1);
+	int firstFruitX, firstFruitY;
+
+	do {
+		firstFruitX = 1 + rand() % (_width - 2);
+		firstFruitY = 1 + rand() % (_height - 2);
+	} while (firstFruitX == player->getX() && firstFruitY == player->getY());
+
+	_fruitX = firstFruitX;
+	_fruitY = firstFruitY;
+
+	_score = 0;
+	_speedReg = 10;
 }
 
 
@@ -18,11 +31,16 @@ SnakeGame::~SnakeGame()
 void SnakeGame::exec()
 {
 	char userInput;
+	size_t count{ 0 };
+
 	while (_state == RESUME)
 	{
-		draw();
+		Sleep(1000 / 30);
+		count++;
 		input();
-		logic();
+		logic(count);
+		draw();
+
 
 		if (_state == OVER)
 		{
@@ -43,12 +61,14 @@ void SnakeGame::draw()
 	}
 	std::cout << std::endl;
 
-	for (size_t i = 0; i < _height - 2; ++i)
+	for (size_t i = 1; i < _height - 1; ++i)
 	{
 		for (size_t j = 0; j < _width; ++j)
 		{
 			if (j == 0 || j == _width - 1)
 				std::cout << '#';
+			else if (j == _fruitX && i == _fruitY)
+				std::cout << 'F';
 			else if (j == player->getX() && i == player->getY())
 				std::cout << 'O';
 			else
@@ -61,11 +81,13 @@ void SnakeGame::draw()
 	{
 		std::cout << '#';
 	}
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
+	std::cout << "Score: " << _score;
 }
 
 void SnakeGame::input()
 {
+	
 	if (_kbhit())
 	{
 		switch (_getch())
@@ -86,9 +108,46 @@ void SnakeGame::input()
 	}
 }
 
-void SnakeGame::logic()
+void SnakeGame::logic(size_t &frameCount)
 {
-	player->move();
+	if (frameCount == 30 / _speedReg)
+	{
+		player->move();
+		frameCount = 0;
+	}
+	
+	if (player->getX() == 0)
+	{
+		player->setX(_width - 2);
+	}
+	else if (player->getX() == _width - 1)
+	{
+		player->setX(1);
+	}
+
+	if (player->getY() == 0)
+	{
+		player->setY(_height - 2);
+	}
+	else if (player->getY() == _height - 1)
+	{
+		player->setY(1);
+	}
+
+	if (player->getX() == _fruitX && player->getY() == _fruitY)
+	{
+		_score += 10;
+
+		int newFruitX, newFruitY;
+
+		do {
+			newFruitX = 1 + rand() % (_width - 2);
+			newFruitY = 1 + rand() % (_height - 2);
+		} while (newFruitX == player->getX() && newFruitY == player->getY());
+
+		_fruitX = newFruitX;
+		_fruitY = newFruitY;
+	}
 }
 
 void SnakeGame::restart()
