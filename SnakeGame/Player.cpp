@@ -28,6 +28,8 @@ void Player::move()
 
 	switch (_direction)
 	{
+	case STOP:
+		return;
 	case UP:
 		--_y;
 		break;

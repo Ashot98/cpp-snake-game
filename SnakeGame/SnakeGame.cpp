@@ -9,6 +9,10 @@ int SnakeGame::_height{ 20 };
 SnakeGame::SnakeGame()
 {
 	player = new Player(_width / 2 - 1, _height / 2 - 1);
+	
+	std::vector<std::string> menuItems{ "RESUME", "SETTINGS", "EXIT" };
+	menu = new Menu(menuItems);
+
 	int firstFruitX, firstFruitY;
 
 	do {
@@ -26,6 +30,8 @@ SnakeGame::SnakeGame()
 
 SnakeGame::~SnakeGame()
 {
+	delete player;
+	delete menu;
 }
 
 void SnakeGame::exec()
@@ -33,16 +39,29 @@ void SnakeGame::exec()
 	char userInput;
 	size_t count{ 0 };
 
-	while (_state == RESUME)
+	while (_state != EXIT)
 	{
 		Sleep(1000 / 30);
 		count++;
+
+		int prevSelected = -1;
+		
+		while (_state == MENU)
+		{
+			input();
+			if (prevSelected != menu->getSelected())
+			{
+				menu->drawMenu();
+				prevSelected = menu->getSelected();
+			}
+		}
+
 		input();
 		logic(count);
 		draw();
 
 
-		if (_state == OVER)
+		if (_state == EXIT)
 		{
 			std::cout << "Do you want to restart game? (y/n): ";
 			std::cin >> userInput;
@@ -113,16 +132,39 @@ void SnakeGame::input()
 		switch (_getch())
 		{
 		case 'w':
-			player->changeDirection(UP);
+			if (_state == RESUME)
+				player->changeDirection(UP);
+			else if (_state == MENU)
+				menu->setSelected(menu->getSelected() - 1);
 			break;
 		case 'd':
-			player->changeDirection(RIGHT);
+			if (_state == RESUME)
+				player->changeDirection(RIGHT);
 			break;
 		case 's':
-			player->changeDirection(DOWN);
+			if (_state == RESUME)
+				player->changeDirection(DOWN);
+			else if (_state == MENU)
+				menu->setSelected(menu->getSelected() + 1);
 			break;
 		case 'a':
-			player->changeDirection(LEFT);
+			if (_state == RESUME)
+				player->changeDirection(LEFT);
+			break;
+		case 'm':
+			if (_state == RESUME)
+			{
+				player->changeDirection(STOP);
+				_state = MENU;
+			}
+			else
+				_state = RESUME;
+			break;
+		case ' ':
+			if (_state == MENU)
+				menuItemPress();
+		case 'x':
+			_state = EXIT;
 			break;
 		}
 	}
@@ -182,7 +224,7 @@ void SnakeGame::logic(size_t &frameCount)
 		{
 			if (playerX == tailX[i] && playerY == tailY[i] && !isEating)
 			{
-				_state = OVER;
+				_state = EXIT;
 			}
 		}
 	}
@@ -205,4 +247,9 @@ void SnakeGame::restart()
 
 	_fruitX = firstFruitX;
 	_fruitY = firstFruitY;
+}
+
+void SnakeGame::menuItemPress()
+{
+
 }

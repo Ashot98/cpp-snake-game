@@ -1,6 +1,1 @@
-﻿  SnakeGame.cpp
-e:\cpp\projects\snakegame\snakegame\snakegame.cpp(64): warning C4018: <: несоответствие типов со знаком и без знака
-e:\cpp\projects\snakegame\snakegame\snakegame.cpp(70): warning C4018: <: несоответствие типов со знаком и без знака
-e:\cpp\projects\snakegame\snakegame\snakegame.cpp(72): warning C4018: <: несоответствие типов со знаком и без знака
-e:\cpp\projects\snakegame\snakegame\snakegame.cpp(99): warning C4018: <: несоответствие типов со знаком и без знака
-  SnakeGame.vcxproj -> E:\Cpp\Projects\SnakeGame\Debug\SnakeGame.exe
+﻿  SnakeGame.vcxproj -> E:\Cpp\Projects\SnakeGame\Debug\SnakeGame.exe
